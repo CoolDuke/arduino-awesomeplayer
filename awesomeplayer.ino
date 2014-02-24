@@ -1,14 +1,17 @@
+/* AwesomePlayer for Arduino */
+
 #include <Tone.h>
 #include <avr/pgmspace.h>
 
-//how many speakers and leds are we using
+//how many songs, speakers and leds are we using
+#define SONGCOUNT 6
 #define TRACKS 2
 #define LEDCOUNT 6
-#define SONGCOUNT 6
 
-//c
+//first song
 byte currentSong=0;
 
+//define some information for each song
 const int bpm[SONGCOUNT]               ={ 135,   90,   90,   90,   90,  120};
 const int takt[SONGCOUNT]              ={   8,    4,    4,    4,    4,    4};
 const float visualizer_pitch[SONGCOUNT]={1.10, 0.45, 0.45, 0.45,    1,    1};
@@ -37,6 +40,37 @@ int nextButtonPort=12;
 //calculate visualizer frequencies
 int visualizer_steps=1100/LEDCOUNT*visualizer_pitch[currentSong];
 
+//declare some more variables
+boolean mute=0;
+boolean blinkLeds=0;
+
+//returns the start address of a track of the current song
+int getTrackAddress(int track){
+  int address;
+  switch(currentSong){
+    case 0:
+      address=pgm_read_word(&song0_tracks[track]);  
+      break;     
+    case 1:
+      address=pgm_read_word(&song1_tracks[track]);  
+      break;     
+    case 2:
+      address=pgm_read_word(&song2_tracks[track]);  
+      break;     
+    case 3:
+      address=pgm_read_word(&song3_tracks[track]);  
+      break;     
+    case 4:
+      address=pgm_read_word(&song4_tracks[track]);  
+      break;     
+    case 5:
+      address=pgm_read_word(&song5_tracks[track]);  
+      break;     
+  }
+  return address; 
+}
+
+//setup configuration
 void setup(){
   Serial.begin(9600);
   
@@ -65,35 +99,7 @@ void setup(){
     flashAddress[t]=getTrackAddress(t);  
 }
 
-//returns the start address of a track of the current song
-int getTrackAddress(int track){
-  int address;
-  switch(currentSong){
-    case 0:
-      address=pgm_read_word(&song0_tracks[track]);  
-      break;     
-    case 1:
-      address=pgm_read_word(&song1_tracks[track]);  
-      break;     
-    case 2:
-      address=pgm_read_word(&song2_tracks[track]);  
-      break;     
-    case 3:
-      address=pgm_read_word(&song3_tracks[track]);  
-      break;     
-    case 4:
-      address=pgm_read_word(&song4_tracks[track]);  
-      break;     
-    case 5:
-      address=pgm_read_word(&song5_tracks[track]);  
-      break;     
-  }
-  return address; 
-}
-
-boolean mute=0;
-boolean blinkLeds=0;
-
+//main loop
 void loop(){
   
   //toggle mute if mute button is being pushed
@@ -149,8 +155,9 @@ void loop(){
         trackFinished = 1;
         flashAddress[t]=getTrackAddress(t);
         break;
-      case 0: //pause - stop tone
+      case 0: //pause - stop tone and led
         spkr[t].stop();
+        toggle_led(0);
         break;
       default: //every other number is treated as frequency
         spkr[t].stop();

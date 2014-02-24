@@ -1,8 +1,18 @@
 #include <Tone.h>
+#include <avr/pgmspace.h>
 
 //how many speakers and leds are we using
 #define TRACKS 2
 #define LEDCOUNT 6
+#define SONGCOUNT 6
+
+//c
+byte currentSong=0;
+
+const int bpm[SONGCOUNT]               ={ 135,   90,   90,   90,   90,  120};
+const int takt[SONGCOUNT]              ={   8,    4,    4,    4,    4,    4};
+const float visualizer_pitch[SONGCOUNT]={1.10, 0.45, 0.45, 0.45,    1,    1};
+const int pitchOctave[SONGCOUNT]       ={   0,    1,    2,    0,    0,    1};
 
 //create speaker object
 Tone spkr[TRACKS];
@@ -10,27 +20,30 @@ Tone spkr[TRACKS];
 //this is where we store the track position
 unsigned int flashAddress[TRACKS];
 
-//define arduino ports for speakers, leds and mute button
+//define arduino ports for speakers, leds and buttons
 int speakers[TRACKS]={9,11};
 int leds[LEDCOUNT]={2,3,4,5,6,7};
 int muteButtonPort=13;
+int nextButtonPort=12;
 
-//select a song by exclusively uncommenting it
-
+//load song data
 #include "song_popcorn.h"
-//#include "song_starwars_theme.h"
-//#include "song_imperial_march.h"
-//#include "song_nur_nach_hause.h"
-//#include "song_monkey_island_theme.h"
-//#include "song_back_to_the_future.h"
-
-//#include "nosong.h"
+#include "song_starwars_theme.h"
+#include "song_imperial_march.h"
+#include "song_nur_nach_hause.h"
+#include "song_monkey_island_theme.h"
+#include "song_back_to_the_future.h"
 
 //calculate visualizer frequencies
-int visualizer_steps=1100/LEDCOUNT*visualizer_pitch;
+int visualizer_steps=1100/LEDCOUNT*visualizer_pitch[currentSong];
 
 void setup(){
   Serial.begin(9600);
+  
+  //initialize buttons
+  pinMode(muteButtonPort,INPUT);
+  pinMode(nextButtonPort,INPUT);
+  
   //initialize speakers
   for(int i=0;i<TRACKS;i++)
     spkr[i].begin(speakers[i]);
@@ -47,10 +60,35 @@ void setup(){
   }
   toggle_led(0);
 
-  //get start address of all tracks
+  //get start address of all tracks of first song
   for(int t=0;t<TRACKS;++t)
-    flashAddress[t]=pgm_read_word(&tracks[t]);
-    
+    flashAddress[t]=getTrackAddress(t);  
+}
+
+//returns the start address of a track of the current song
+int getTrackAddress(int track){
+  int address;
+  switch(currentSong){
+    case 0:
+      address=pgm_read_word(&song0_tracks[track]);  
+      break;     
+    case 1:
+      address=pgm_read_word(&song1_tracks[track]);  
+      break;     
+    case 2:
+      address=pgm_read_word(&song2_tracks[track]);  
+      break;     
+    case 3:
+      address=pgm_read_word(&song3_tracks[track]);  
+      break;     
+    case 4:
+      address=pgm_read_word(&song4_tracks[track]);  
+      break;     
+    case 5:
+      address=pgm_read_word(&song5_tracks[track]);  
+      break;     
+  }
+  return address; 
 }
 
 boolean mute=0;
@@ -62,6 +100,22 @@ void loop(){
   if(digitalRead(muteButtonPort)){
     delay(200);
     mute^=1;
+  }
+  
+  //selects the next song if next button is beeing pushed
+  if(digitalRead(nextButtonPort)){
+    delay(200);
+    
+    //select first song if last one is active, otherwise select the next one
+    if(currentSong==SONGCOUNT-1) currentSong=0;
+    else currentSong++;
+    
+    //get memory addresses of new song
+    for(int t=0;t<TRACKS;++t)
+      flashAddress[t]=getTrackAddress(t);  
+    
+    //calculate new visualizer frequencies 
+    visualizer_steps=1100/LEDCOUNT*visualizer_pitch[currentSong];
   }
    
   //if muted
@@ -93,7 +147,7 @@ void loop(){
         break;
       case -1: //track is finished - reset memory address
         trackFinished = 1;
-        flashAddress[t]=pgm_read_word(&tracks[t]);
+        flashAddress[t]=getTrackAddress(t);
         break;
       case 0: //pause - stop tone
         spkr[t].stop();
@@ -110,7 +164,7 @@ void loop(){
     }
   }
   //insert pause defined by bpm and takt
-  delay(60000/bpm/takt);
+  delay(60000/bpm[currentSong]/takt[currentSong]);
 }
 
 //reads the next note from the flash memory and returns its frequency
@@ -147,7 +201,7 @@ int getNextNote(int t) {
 //returns the frequency of a given note and octave
 int noteNameToFreq(String note, int octave) {
   //change octave if a song needs it
-  octave+=pitchOctave;
+  octave+=pitchOctave[currentSong];
 
   //get frequencies by note name
   float val = 0.0;

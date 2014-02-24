@@ -1,9 +1,6 @@
 // Star Wars - Imperial March
-const int bpm=90;
-const int takt=4;
-const float visualizer_pitch=0.45;
-const int pitchOctave=2;
-const prog_char track1[] PROGMEM = 
+
+const prog_char song2_track1[] PROGMEM = 
 "g2..-g2..-g2..-es2.-ais2"
 "g2..-es2.-ais2g2......-"
 "d3..-d3..-d3..-es3.-ais2"
@@ -21,7 +18,7 @@ const prog_char track1[] PROGMEM =
 "g2..-es2.-b2g2......-"
 ;
 
-const prog_char track2[] PROGMEM = 
+const prog_char song2_track2[] PROGMEM = 
 "g1..-g1..-g1..-es1..-"
 "g1..-es1..-g1-g1g1g1-g1-"
 "g1..-g1..-g1..-ges1..-"
@@ -39,5 +36,5 @@ const prog_char track2[] PROGMEM =
 "g1..-es1..-g1..-g0..-"
 ;
 
-PROGMEM const char * const tracks[TRACKS] = { track1,track2 };
+PROGMEM const char * const song2_tracks[TRACKS] = { song2_track1,song2_track2 };
 

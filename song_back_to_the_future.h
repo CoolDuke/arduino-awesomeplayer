@@ -1,9 +1,5 @@
 // Back to the Future - Title //incomplete
-const int bpm=120;
-const int takt=4;
-const float visualizer_pitch=1;
-const int pitchOctave=1;
-const prog_char track1[] PROGMEM = 
+const prog_char song5_track1[] PROGMEM = 
 "----c3...e3.....c4."
 "ais3...ais3..a3g3a3.g3.f3..."
 "g3...g3..e3"
@@ -45,7 +41,7 @@ const prog_char track1[] PROGMEM =
 "------------------------------------------------"
 ;
 
-const prog_char track2[] PROGMEM = 
+const prog_char song5_track2[] PROGMEM = 
 "----------------"
 "----g2...a2...ais2..."
 "c3......."
@@ -87,5 +83,5 @@ const prog_char track2[] PROGMEM =
 "------------------------------------------------"
 ;
 
-PROGMEM const char * const tracks[TRACKS] = { track1,track2 };
+PROGMEM const char * const song5_tracks[TRACKS] = { song5_track1,song5_track2 };
 

@@ -1,9 +1,5 @@
 // Monkey Island 1 - Intro
-const int bpm=90;
-const int takt=4;
-const float visualizer_pitch=1;
-const int pitchOctave=0;
-const prog_char track1[] PROGMEM = 
+const prog_char song4_track1[] PROGMEM = 
 "e4h4e5fis5fis5......-----"
 "fis5.......--------"
 "fis6h5g5fis5fis5.....--e5..."
@@ -62,7 +58,7 @@ const prog_char track1[] PROGMEM =
 "---------------------------------------------------"
 ;
 
-const prog_char track2[] PROGMEM =
+const prog_char song4_track2[] PROGMEM =
 "e3.......--------"
 "e3.......--------"
 "e3.......--------"
@@ -122,5 +118,5 @@ const prog_char track2[] PROGMEM =
 
 "---------------------------------------------------"
 ;
-PROGMEM const char * const tracks[TRACKS] = { track1,track2 };
+PROGMEM const char * const song4_tracks[TRACKS] = { song4_track1,song4_track2 };
 

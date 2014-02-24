@@ -14,7 +14,7 @@ byte currentSong=0;
 //define some information for each song
 const int bpm[SONGCOUNT]               ={ 135,   90,   90,   90,   90,  120};
 const int takt[SONGCOUNT]              ={   8,    4,    4,    4,    4,    4};
-const float visualizer_pitch[SONGCOUNT]={1.10, 0.45, 0.45, 0.45,    1,    1};
+const float visualizer_pitch[SONGCOUNT]={1.10, 0.45,    1, 0.40,    1,    1};
 const int pitchOctave[SONGCOUNT]       ={   0,    1,    2,    0,    0,    1};
 
 //create speaker object
@@ -157,7 +157,7 @@ void loop(){
         break;
       case 0: //pause - stop tone and led
         spkr[t].stop();
-        toggle_led(0);
+        if(t==0) toggle_led(0);
         break;
       default: //every other number is treated as frequency
         spkr[t].stop();
